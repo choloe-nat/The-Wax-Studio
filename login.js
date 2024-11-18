@@ -67,4 +67,19 @@ document.getElementById('resetPassword').addEventListener('click', function() {
         // 19. If the TRN is not found, show an error message indicating that the TRN was not found.
         alert("TRN not found. Unable to reset the password.");  // Show error message if TRN doesn't exist in the system.
     }
+
+    // products.js (or inside your products.html)
+window.onload = function() {
+    // Check if user is logged in (check for TRN or a login flag in localStorage)
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    // If no user data exists in localStorage, redirect to login page
+    if (!user) {
+        window.location.href = "login.html";
+    }
+
+    // Otherwise, load the product catalog
+    displayProducts();
+};
+
 });
