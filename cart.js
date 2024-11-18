@@ -1,50 +1,91 @@
-// 1. Retrieve the cart data from localStorage or initialize an empty array if no cart is found
+// Initialize the cart from localStorage or an empty array if nothing is found
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-// 2. Get the element where cart details will be displayed
-const cartDetails = document.getElementById('cartDetails');
+// Function to display cart items
+function displayCart() {
+    const cartItemsDiv = document.getElementById('cartItems');
+    const subtotalElement = document.getElementById('subtotal');
+    const taxesElement = document.getElementById('taxes');
+    const discountElement = document.getElementById('discount');
+    const totalElement = document.getElementById('total');
 
-// 3. Function to update and display the cart details
-function updateCart() {
-    cartDetails.innerHTML = '';  // 4. Clear any existing cart details from the display
+    let subtotal = 0;
+    cartItemsDiv.innerHTML = ''; // Clear existing items in the cart display
 
-    // 5. Loop through each item in the cart to display its details
-    cart.forEach((item, index) => {
-        // 6. Create a new div for each item in the cart
+    // Loop through the cart items and display each item
+    cart.forEach(item => {
         const itemDiv = document.createElement('div');
-
-        // 7. Populate the itemDiv with the item's name, price, and a "Remove" button
+        itemDiv.classList.add('cart-item');
         itemDiv.innerHTML = `
-            <p>${item.name} - $${item.price}</p>
-            <button onclick="removeItem(${index})">Remove</button>
+            <img src="${item.image}" alt="${item.name}">
+            <div class="name">${item.name}</div>
+            <div class="quantity">
+                <button onclick="updateQuantity('${item.name}', -1)">-</button>
+                <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity('${item.name}', this.value)">
+                <button onclick="updateQuantity('${item.name}', 1)">+</button>
+            </div>
+            <div class="price">$${(item.price * item.quantity).toFixed(2)}</div>
+            <button class="remove-item" onclick="removeItem('${item.name}')">Remove</button>
         `;
-        
-        // 8. Append the itemDiv to the cartDetails container
-        cartDetails.appendChild(itemDiv);
+        cartItemsDiv.appendChild(itemDiv);
+        subtotal += item.price * item.quantity;
     });
+
+    // Example tax and discount values
+    const taxRate = 0.10; // 10% tax rate
+    const discount = 5.00; // Fixed discount for demonstration
+
+    const taxes = subtotal * taxRate;
+    const total = subtotal + taxes - discount;
+
+    // Update the subtotal, taxes, discount, and total display
+    subtotalElement.textContent = subtotal.toFixed(2);
+    taxesElement.textContent = taxes.toFixed(2);
+    discountElement.textContent = discount.toFixed(2);
+    totalElement.textContent = total.toFixed(2);
 }
 
-// 9. Function to remove an item from the cart by index
-function removeItem(index) {
-    // 10. Remove the item from the cart array using splice
-    cart.splice(index, 1);
+// Display the cart when the page loads
+window.onload = displayCart;
 
-    // 11. Save the updated cart back to localStorage
-    localStorage.setItem('cart', JSON.stringify(cart));
+// Function to update the quantity of an item
+function updateQuantity(name, newQuantity) {
+    // Ensure newQuantity is a valid number
+    if (typeof newQuantity === 'string') {
+        newQuantity = parseInt(newQuantity);
+    }
 
-    // 12. Update the cart display after removal
-    updateCart();
+    // Find the item in the cart and update its quantity
+    const itemIndex = cart.findIndex(item => item.name === name);
+    if (itemIndex > -1) {
+        cart[itemIndex].quantity = newQuantity > 0 ? newQuantity : 1; // Prevent quantity from being zero or negative
+        localStorage.setItem('cart', JSON.stringify(cart)); // Save the updated cart to localStorage
+        displayCart(); // Re-render the cart
+    }
 }
 
-// 13. Add an event listener to the "Clear All" button to remove all items from the cart
-document.getElementById('clearAllButton').addEventListener('click', () => {
-    // 14. Remove the cart from localStorage and reset the cart array
-    localStorage.removeItem('cart');
+// Function to remove an item from the cart
+function removeItem(name) {
+    // Filter out the item by name
+    cart = cart.filter(item => item.name !== name);
+    localStorage.setItem('cart', JSON.stringify(cart)); // Save the updated cart
+    displayCart(); // Re-render the cart
+}
+
+// Function to clear all items from the cart
+function clearCart() {
     cart = [];
+    localStorage.removeItem('cart'); // Clear the cart from localStorage
+    displayCart(); // Re-render the cart
+}
 
-    // 15. Update the cart display after clearing all items
-    updateCart();
-});
+// Function to handle checkout (redirect or further action)
+function checkout() {
+    alert('Proceeding to checkout...');
+    window.location.href = 'checkout.html'; // Redirect to the checkout page
+}
 
-// 16. Call the updateCart function to display the cart when the page loads
-updateCart();
+// Close the cart (for modal use or closing the view)
+function closeCart() {
+    window.location.href = 'index.html'; // Redirect back to the homepage or previous page
+}
