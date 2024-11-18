@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - The Smooth Skin Studio</title>
+    <link rel="stylesheet" href="styles.css"> <!-- External Stylesheet -->
+    <style>
+        /* Styling for the checkout page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fce4ec; /* Light pink background */
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: #fff; /* White background for the header */
+            color: #4CAF50; /* Green text color */
+            text-align: center;
+            padding: 20px;
+            border-bottom: 5px solid #4CAF50;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .checkout-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background-color: #fff;
+            margin: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .summary, .shipping-details {
+            width: 45%;
+        }
+
+        .summary h2, .shipping-details h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .summary p, .shipping-details p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .shipping-details input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .checkout-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .checkout-actions button {
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .checkout-actions button:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-btn {
+            background-color: #f44336; /* Red for cancel button */
+        }
+
+        .cancel-btn:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Checkout</h1>
+    </header>
+
+    <div class="checkout-container">
+        <!-- Cart Summary Section -->
+        <div class="summary">
+            <h2>Order Summary</h2>
+            <div id="orderSummary"></div>
+            <div class="total">
+                <p>Subtotal: $<span id="summarySubtotal">0.00</span></p>
+                <p>Taxes (10%): $<span id="summaryTaxes">0.00</span></p>
+                <p>Discount: $<span id="summaryDiscount">0.00</span></p>
+                <p>Total: $<span id="summaryTotal">0.00</span></p>
+            </div>
+        </div>
+
+        <!-- Shipping Details Form -->
+        <div class="shipping-details">
+            <h2>Shipping Details</h2>
+            <form id="shippingForm">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="address">Shipping Address</label>
+                <input type="text" id="address" name="address" required>
+
+                <label for="payment">Amount Being Paid ($)</label>
+                <input type="number" id="payment" name="payment" required min="0" step="0.01">
+
+                <div class="checkout-actions">
+                    <button type="button" id="confirmBtn">Confirm Checkout</button>
+                    <button type="button" class="cancel-btn" onclick="goBackToCart()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Retrieve cart data from localStorage
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Function to display the cart summary
+        function displaySummary() {
+            const orderSummaryDiv = document.getElementById('orderSummary');
+            const subtotalElement = document.getElementById('summarySubtotal');
+            const taxesElement = document.getElementById('summaryTaxes');
+            const discountElement = document.getElementById('summaryDiscount');
+            const totalElement = document.getElementById('summaryTotal');
+
+            let subtotal = 0;
+            orderSummaryDiv.innerHTML = ''; // Clear the current cart summary
+
+            // Loop through the cart to calculate subtotal and display items
+            cart.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.innerHTML = `
+                    <p>${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}</p>
+                `;
+                orderSummaryDiv.appendChild(itemDiv);
+                subtotal += item.price * item.quantity;
+            });
+
+            // Apply taxes and discount
+            const taxRate = 0.10; // 10% tax rate
+            const taxes = subtotal * taxRate;
+            const discount = 5.00; // Fixed discount for simplicity
+
+            // Update the totals in the checkout summary
+            const total = subtotal + taxes - discount;
+
+            subtotalElement.textContent = subtotal.toFixed(2);
+            taxesElement.textContent = taxes.toFixed(2);
+            discountElement.textContent = discount.toFixed(2);
+            totalElement.textContent = total.toFixed(2);
+        }
+
+        // Display the order summary when the page loads
+        window.onload = displaySummary;
+
+        // Function to confirm the checkout
+        document.getElementById('confirmBtn').onclick = function() {
+            const name = document.getElementById('name').value;
+            const address = document.getElementById('address').value;
+            const payment = parseFloat(document.getElementById('payment').value);
+            const totalCost = parseFloat(document.getElementById('summaryTotal').textContent);
+
+            if (!name || !address || isNaN(payment) || payment <= 0) {
+                alert('Please fill in all fields correctly.');
+                return;
+            }
+
+            if (payment < totalCost) {
+                alert('Insufficient payment. Please enter the correct amount.');
+                return;
+            }
+
+            // Generate an invoice and display a confirmation
+            const invoice = `
+                <h2>Invoice</h2>
+                <p>Name: ${name}</p>
+                <p>Address: ${address}</p>
+                <p>Amount Paid: $${payment.toFixed(2)}</p>
+                <p>Total Cost: $${totalCost.toFixed(2)}</p>
+                <p>Change: $${(payment - totalCost).toFixed(2)}</p>
+            `;
+
+            // Display the invoice
+            document.body.innerHTML = `
+                <header><h1>Invoice - The Smooth Skin Studio</h1></header>
+                <div class="checkout-container">${invoice}</div>
+            `;
+        };
+
+        // Function to go back to the cart if the user cancels
+        function goBackToCart() {
+            window.location.href = 'cart.html'; // Redirect to the cart page
+        }
+    </script>
+
+</body>
+</html>

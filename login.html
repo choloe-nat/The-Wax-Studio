@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=1.0, user-scalable=no">
+    <title>Login - The Smooth Skin Studio</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* General Body and Layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fce4ec; /* Light pink background */
+        }
+
+        header {
+            background-color: #4CAF50; /* Green header for contrast */
+            color: white;
+            padding: 15px 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* Main Form Section */
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 60px);
+            padding: 10px;
+        }
+
+        #login {
+            background-color: white; /* White background for the form */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        #login h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #333; /* Dark color for the heading */
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+            color: #555; /* Dark gray for the labels */
+        }
+
+        input, button {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input:focus, button:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        button {
+            background-color: #4CAF50; /* Green button */
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button[type="reset"] {
+            background-color: #f44336; /* Red cancel button */
+        }
+
+        button[type="reset"]:hover {
+            background-color: #e53935;
+        }
+
+        #errorMessage {
+            color: red;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>The Smooth Skin Studio - Login</h1>
+    </header>
+
+    <main>
+        <section id="login">
+            <h2>Login to Your Account</h2>
+            <form id="loginForm">
+                <label for="trn">Tax Registration Number (TRN):</label>
+                <input type="text" id="trn" required pattern="\d{3}-\d{3}-\d{3}" title="Format: 000-000-000">
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+
+                <button type="submit">Login</button>
+                <button type="reset" id="cancelButton">Cancel</button>
+
+                <p id="errorMessage"></p> <!-- Error message display -->
+            </form>
+        </section>
+    </main>
+
+    <!-- Include your JavaScript file -->
+    <script src="login.js"></script>
+</body>
+</html>
